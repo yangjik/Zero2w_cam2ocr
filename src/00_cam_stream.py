@@ -22,4 +22,12 @@ pi_camv2.start()
 # 공식문서에서 start 하고 2초 기다림
 time.sleep(2)
 
-pi_camv2.capture_file("./test.jpg")
+# 카메라 동작 하고 1프레임만 저장
+try:
+    pi_camv2.capture_file("./test.jpg")
+    print("capture success!!!\n")
+except Exception as e:
+    print("capture fail!!!!!\n", e)
+
+pi_camv2.stop_preview()
+pi_camv2.stop()
