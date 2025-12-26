@@ -4,8 +4,8 @@
 set -e -o pipefail
 
 # 패키지 whl파일 다운 <- zero2w는 cpu, ram 이 작기때문에 가상환경 사용 x
-base_path=~/zero2w_cam2ocr
-err_log=~/zero2w_cam2ocr/download_whl
+base_path=~/Zero2w_cam2ocr
+err_log=~/Zero2w_cam2ocr/download_whl
 
 cd $base_path
 
