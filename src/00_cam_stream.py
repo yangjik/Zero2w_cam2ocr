@@ -10,6 +10,9 @@ img_format = ['YUV420',     #  YUV images with a plane of Y values followed by a
               'RGB888',     # 24 bits per pixel, ordered [B, G, R].
               'BGR888'      # as above, but ordered [R, G, B].
               ]
+
+img_format = img_format[3]
+
 current_stream = False
 
 app = Flask(__name__)
@@ -20,12 +23,12 @@ def cam_setting():
     pi_camv2 = Picamera2()
     cam_config= pi_camv2.create_preview_configuration(
         main={"size" : (img_w, img_h),
-            "format" : img_format[0]
+            "format" : img_format
         }
     )
     try:
         pi_camv2.configure(cam_config)
-        print(f"[cam setting] current image width, height : [{img_w}, {img_h}] / image format : [{img_format[0]}]\n")
+        print(f"[cam setting] current image width, height : [{img_w}, {img_h}] / image format : [{img_format}]\n")
     except Exception as e:
         print('[cam setting] camera setting error : [{e}]\n')
     pi_camv2.start()
@@ -46,17 +49,34 @@ def cam_setting_after(pi_camv2):
     pi_camv2.stop()
 
 def cam_streamming(pi_camv2):
-    pi_camv2.
+    while True:
+        frame = pi_camv2.capture_array()
+
+        retval, jpg_frame = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
+
+        frame_byte = jpg_frame.tobytes()
+
+        if not retval:
+            print("[Encoding] img encoding fail\n")
+        else:
+            yield(b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + 
+                frame_byte + b'\r\n')
+            
+            time.sleep(0.05)
+
 
 @app.route('/stream')
 def stream():
-    Response()
+    return Response(cam_streamming(pi_camv2), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
 
-    pi_cam = cam_setting()
+    pi_camv2 = cam_setting()
+
+    app.run(host='0.0.0.0', port='8000')
 
     # 카메라 동작 후 원샷
-    # cam_setting_after(pi_cam)
+    # cam_setting_after(pi_camv2)
 
     # 스트리밍
