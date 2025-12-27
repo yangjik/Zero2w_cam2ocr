@@ -16,4 +16,4 @@ cd $base_path
 
 pip download -r $base_path/requirements.txt -d $base_path/download_whl --only-binary=:all: -v | tee $err_log/download_err.log
 
-pip install --no-index --find-links="$base_path/download_whl" -r $base_path/requirements.txt -v | tee $err_log/install_err.log
+sudo pip install --no-index --find-links="$base_path/download_whl" -r $base_path/requirements.txt -v --break-system-packages | tee $err_log/install_err.log 
