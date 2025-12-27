@@ -1,6 +1,5 @@
 opencv-python-headless==4.10.0.84
-numpy==1.26.4
+numpy==2.1.0
 pandas
 pyarrow
-picamera2
 Flask
