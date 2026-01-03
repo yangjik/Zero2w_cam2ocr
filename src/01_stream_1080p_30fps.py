@@ -34,7 +34,10 @@ def cam_setting():
         print('[cam setting] camera setting error : [{e}]\n')
     
     # fps 설정
-    pi_camv2.set_controls({'FrameRate' : 30})
+    # pi_camv2.set_controls({'FrameRate' : 30})
+
+    # fps 설정
+    pi_camv2.set_controls({"FrameDurationLimits" : (33333, 33333)})
 
     print(f"parameter : {pi_camv2.set_controls}\n")
 
