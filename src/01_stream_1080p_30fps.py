@@ -25,6 +25,9 @@ def cam_setting():
     cam_config= pi_camv2.create_preview_configuration(
         main={"size" : (img_w, img_h),
             "format" : img_format
+        },
+        controls={
+            'FrameRate' : 30.0
         }
     )
     try:
@@ -35,11 +38,7 @@ def cam_setting():
     
     # fps 설정
     # pi_camv2.set_controls({'FrameRate' : 30})
-
-    # fps 설정
-    pi_camv2.set_controls({"FrameDurationLimits" : (33333, 33333)})
-
-    print(f"parameter : {pi_camv2.set_controls}\n")
+    # pi_camv2.set_controls({"FrameDurationLimits" : (33333, 33333)})
 
     pi_camv2.start()
     # 공식문서에서 start 하고 2초 기다림
@@ -84,9 +83,8 @@ if __name__ == '__main__':
 
     pi_camv2 = cam_setting()
 
+    # 스트리밍 시작
     app.run(host='0.0.0.0', port='8000')
 
     # 카메라 동작 후 원샷
     # cam_setting_after(pi_camv2)
-
-    # 스트리밍
