@@ -1,6 +1,7 @@
 from picamera2 import Picamera2, Preview
 from flask import Flask, Response
 import cv2, time
+import threading
 
 img_w = 1920
 img_h = 1080
@@ -31,6 +32,12 @@ def cam_setting():
         print(f"[cam setting] current image width, height : [{img_w}, {img_h}] / image format : [{img_format}]\n")
     except Exception as e:
         print('[cam setting] camera setting error : [{e}]\n')
+    
+    # fps 설정
+    pi_camv2.set_controls({'FrameRate' : 30})
+
+    print(f"parameter : {pi_camv2.set_controls}\n")
+
     pi_camv2.start()
     # 공식문서에서 start 하고 2초 기다림
     time.sleep(2)
