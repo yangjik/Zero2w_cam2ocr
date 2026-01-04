@@ -13,6 +13,8 @@ img_format = ['YUV420',     #  YUV images with a plane of Y values followed by a
               ]
 
 img_format = img_format[3]
+img_quality = 90
+img_fps = 10.0
 
 current_stream = False
 
@@ -27,7 +29,7 @@ def cam_setting():
             "format" : img_format
         },
         controls={
-            'FrameRate' : 30.0
+            'FrameRate' : img_fps
         }
     )
     try:
@@ -36,10 +38,6 @@ def cam_setting():
     except Exception as e:
         print('[cam setting] camera setting error : [{e}]\n')
     
-    # fps 설정
-    # pi_camv2.set_controls({'FrameRate' : 30})
-    # pi_camv2.set_controls({"FrameDurationLimits" : (33333, 33333)})
-
     pi_camv2.start()
     # 공식문서에서 start 하고 2초 기다림
     time.sleep(2)
@@ -62,7 +60,7 @@ def cam_streamming(pi_camv2):
         frame = pi_camv2.capture_array()
         
         # cpu 인코딩
-        retval, jpg_frame = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
+        retval, jpg_frame = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), img_quality])
 
         frame_byte = jpg_frame.tobytes()
 
@@ -72,8 +70,6 @@ def cam_streamming(pi_camv2):
             yield(b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + 
                 frame_byte + b'\r\n')
-            
-            time.sleep(0.05)
 
 @app.route('/stream')
 def stream():
