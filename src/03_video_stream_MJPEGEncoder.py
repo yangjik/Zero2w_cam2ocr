@@ -1,5 +1,6 @@
 from picamera2 import Picamera2
 from picamera2.encoders import MJPEGEncoder
+from picamera2.outputs import FileOutput
 from flask import Flask, Response
 import time, cv2, io
 
@@ -27,12 +28,11 @@ def cam_setting():
             main={
                 "size" : (img_wdth, img_height),
                 "format" : img_channel,
-                "quality" : img_quality
             },
             controls={
                 "FrameRate" : img_fps
             },
-            encode="main"
+            encode="raw"
         )
 
         picam2.configure(config)
@@ -43,19 +43,20 @@ def cam_setting():
         return picam2
     
     except Exception as err:
-        print("[Cam Setting] Pi camera V2 Setting Fail..\n")
+        print("[Cam Setting] Pi camera V2 Setting Fail.. : [{err}]\n")
         return None
     
 def cam_streaming(picam2):
     # 7.1.3. MJPEGEncoder 문서
-    encoder = MJPEGEncoder()
+    encoder = MJPEGEncoder(bitrate=30000000)
 
-    picam2.start_recording(output=encoder)
+    picam2.start_recording(encoder)
     
+    buffer = io.BytesIO()
+
     try:
         while True:
-            frame = encoder.wait_for_frame()
-            
+            frame = FileOutput(buffer)
             if not frame:
                 break
 

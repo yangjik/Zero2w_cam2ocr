@@ -3,3 +3,4 @@ numpy==2.1.0
 pandas
 pyarrow
 Flask
+pytesseract
