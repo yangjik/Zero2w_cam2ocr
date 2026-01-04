@@ -26,7 +26,8 @@ def cam_setting():
         config = picam2.create_video_configuration(
             main={
                 "size" : (img_wdth, img_height),
-                "format" : img_channel
+                "format" : img_channel,
+                "quality" : img_quality
             },
             controls={
                 "FrameRate" : img_fps
@@ -47,7 +48,7 @@ def cam_setting():
     
 def cam_streaming(picam2):
     # 7.1.3. MJPEGEncoder 문서
-    encoder = MJPEGEncoder(quality=img_quality)
+    encoder = MJPEGEncoder()
 
     picam2.start_recording(output=encoder)
     
