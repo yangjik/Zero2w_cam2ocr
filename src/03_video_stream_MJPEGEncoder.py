@@ -47,9 +47,9 @@ def cam_setting():
     
 def cam_streaming(picam2):
     # 7.1.3. MJPEGEncoder 문서
-    encoder = MJPEGEncoder()
+    encoder = MJPEGEncoder(quality=img_quality)
 
-    picam2.start_recording(encoder)
+    picam2.start_recording(output=encoder)
     
     try:
         while True:
