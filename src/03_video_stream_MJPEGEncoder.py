@@ -8,7 +8,14 @@ img_height = 1080
 img_fps = 30.0
 img_format = ['jpeg', 'png', 'bmp', 'gif']
 img_format = img_format[0]
-img_quality = 95
+img_quality = 90
+img_channel = ['XBGR8888',  # 32bit [R, G, B, 255]
+               'XRGB8888',  # 32bit [B, G, R, 255]
+               'RGB888',    # [B, G, R]
+               'BGR888',    # [R, G, B]
+               'YUV420'     # YUV420 
+               ]
+img_channel = img_channel[3]
 
 app = Flask(__name__)
 
@@ -18,12 +25,13 @@ def cam_setting():
     try:
         config = picam2.create_video_configuration(
             main={
-                "size" : (img_wdth, img_height)
+                "size" : (img_wdth, img_height),
+                "format" : img_channel
             },
             controls={
                 "FrameRate" : img_fps
             },
-            encode="raw"
+            encode="main"
         )
 
         picam2.configure(config)
@@ -35,20 +43,34 @@ def cam_setting():
     
     except Exception as err:
         print("[Cam Setting] Pi camera V2 Setting Fail..\n")
-
+        return None
+    
 def cam_streaming(picam2):
     # 7.1.3. MJPEGEncoder 문서
     encoder = MJPEGEncoder()
 
-    while True:
-        picam2.start_recording(encoder)
+    picam2.start_recording(encoder)
+    
+    try:
+        while True:
+            frame = encoder.wait_for_frame()
+            
+            if not frame:
+                break
 
-        
+            yield(b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            
+    except Exception as err:
+        print(f'[Cam Encoder] MJPEGEncoder fail\n')
 
+    finally:
+        picam2.stop_recording()
+        print("[Cam Encoder] stop recording : [{err}]\n")
 
 @app.route('/')
 def home():
-    return 'Raspberry Pi Zero2w'
+    return '<h1>Raspberry Pi Zero2w</h1>'
 
 @app.route('/stream')
 def stream():
@@ -57,4 +79,8 @@ def stream():
 if __name__ == '__main__':
     picam2 = cam_setting()
 
-    # if 
+    if picam2 != None:
+        try:
+            app.run(host='0.0.0.0', port=5000, threaded=True)
+        finally:
+            picam2.stop()
